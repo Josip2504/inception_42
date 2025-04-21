@@ -16,8 +16,33 @@ services:
     restart: unless-stopped
     env_file: .env
 
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb
+    image: mariadb42
+    volumes:
+      - db_volume:/var/lib/mysql
+    networks:
+      - inception
+    restart: unless-stopped
+    env_file: .env
+    secrets:
+      - db_root_password
+      - db_password
+    environment:
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - MYSQL_USER=${DATABASE_USER}
+      - MYSQL_HOST=${MYSQL_HOST}
+
+secrets:
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_password:
+    file: ../secrets/db_password.txt
+
 volumes:
   wordpress_volume:
+  db_volume:
 
 networks:
   inception:
