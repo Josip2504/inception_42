@@ -15,7 +15,6 @@ services:
       - inception
     restart: unless-stopped
     env_file: .env
-
   mariadb:
     container_name: mariadb
     build: ./requirements/mariadb
@@ -27,12 +26,18 @@ services:
     restart: unless-stopped
     env_file: .env
     secrets:
-      - db_root_password
-      - db_password
+      - source: db_root_password
+        target: /run/secrets/db_root_password
+      - source: db_password
+        target: /run/secrets/db_password
     environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=${DATABASE_NAME}
       - MYSQL_USER=${DATABASE_USER}
-      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=no
+      - MYSQL_INITDB_SKIP_TZINFO=1
 
 secrets:
   db_root_password:
@@ -47,3 +52,4 @@ volumes:
 networks:
   inception:
     name: inception
+    driver: bridge

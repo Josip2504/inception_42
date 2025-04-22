@@ -10,7 +10,7 @@ up:
 	@docker compose -f $(COMPOSE_FILE) up -d
 
 down:
-	@docker compose -f $(COMPOSE_FILE) down
+	@docker compose -f $(COMPOSE_FILE) down -v
 
 stop:
 	@docker compose -f $(COMPOSE_FILE) stop
