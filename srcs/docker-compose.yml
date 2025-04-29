@@ -17,7 +17,7 @@ services:
     env_file: .env
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb
+    build: requirements/mariadb
     image: mariadb42
     volumes:
       - db_volume:/var/lib/mysql
@@ -26,17 +26,14 @@ services:
     restart: unless-stopped
     env_file: .env
     secrets:
-      - source: db_root_password
-        target: /run/secrets/db_root_password
-      - source: db_password
-        target: /run/secrets/db_password
+      - db_root_password
+      - db_password
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=${DATABASE_NAME}
       - MYSQL_USER=${DATABASE_USER}
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=no
       - MYSQL_INITDB_SKIP_TZINFO=1
 
 secrets:
