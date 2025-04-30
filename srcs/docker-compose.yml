@@ -3,50 +3,58 @@ services:
     container_name: nginx
     build:
       context: ./requirements/nginx
-      dockerfile: Dockerfile
     image: nginx42
+    depends_on:
+      - mariadb
+      #- wordpress
     ports:
       - "443:443"
     volumes:
-      - ./requirements/nginx/conf:/etc/nginx/conf.d
-      - ./requirements/nginx/tools:/etc/nginx/tools
-      - wordpress_volume:/var/www/html
+      - ./requirements/nginx/conf:/etc/nginx/conf.d:ro
+      - ./requirements/nginx/tools:/etc/nginx/tools:ro
+      #- wordpress_volume:/var/www/html
     networks:
-      - inception
+      - inception_network
     restart: unless-stopped
     env_file: .env
+
   mariadb:
+    build:
+      context: ./requirements/mariadb
     container_name: mariadb
-    build: requirements/mariadb
-    image: mariadb42
-    volumes:
-      - db_volume:/var/lib/mysql
+    restart: always
     networks:
-      - inception
-    restart: unless-stopped
-    env_file: .env
+      - inception_network
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_USER=wp_user
     secrets:
       - db_root_password
       - db_password
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=${DATABASE_NAME}
-      - MYSQL_USER=${DATABASE_USER}
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
-      - MYSQL_INITDB_SKIP_TZINFO=1
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USER}/data/mariadb
+      o: bind
+  #wordpress_volume:
+   # driver: local
+    #driver_opts:
+     # type: none
+      #device: /home/${USER}/data/wordpress
+      # o: bind
+
+networks:
+  inception_network:
+    driver: bridge
 
 secrets:
   db_root_password:
     file: ../secrets/db_root_password.txt
   db_password:
     file: ../secrets/db_password.txt
-
-volumes:
-  wordpress_volume:
-  db_volume:
-
-networks:
-  inception:
-    name: inception
-    driver: bridge
