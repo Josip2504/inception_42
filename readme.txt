@@ -1,10 +1,11 @@
-nginx working
 
-mariadb working
+---to generate keys---
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ./requirements/nginx/tools/nginx.key \
+  -out ./requirements/nginx/tools/nginx.crt \
+  -subj "/CN=jsamardz.42.fr"
 
-➜  inception_42 git:(main) ✗ docker exec nginx sh -c "if nc -zv mariadb 3306 &> /dev/null; then echo '✅ MariaDB reachable from NGINX'; curl -ks https://localhost >/dev/null && echo '✅ NGINX serving HTTPS'; else echo '❌ MariaDB unreachable'; fi"
-✅ MariaDB reachable from NGINX
-sh: 1: nc: not found
-✅ NGINX serving HTTPS
 
-both working together
+
+---to delete keys---
+sudo rm srcs/requirements/nginx/tools/nginx.crt srcs/requirements/nginx/tools/nginx.key 
