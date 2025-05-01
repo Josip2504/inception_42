@@ -6,13 +6,13 @@ services:
     image: nginx42
     depends_on:
       - mariadb
-      #- wordpress
+      - wordpress
     ports:
       - "443:443"
     volumes:
       - ./requirements/nginx/conf:/etc/nginx/conf.d:ro
       - ./requirements/nginx/tools:/etc/nginx/tools:ro
-      #- wordpress_volume:/var/www/html
+      - wordpress_volume:/var/www/html:ro
     networks:
       - inception_network
     restart: unless-stopped
@@ -31,8 +31,29 @@ services:
       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
       - MYSQL_USER=wp_user
+      - MYSQL_DATABASE=wordpress
     secrets:
       - db_root_password
+      - db_password
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+    container_name: wordpress
+    image: wordpress-debian
+    restart: always
+    networks:
+      - inception_network
+    volumes:
+      - wordpress_volume:/var/www/html
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_USER=wp_user
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password
+      - WORDPRESS_DB_NAME=wordpress
+    depends_on:
+      - mariadb
+    secrets:
       - db_password
 
 volumes:
@@ -40,18 +61,19 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/${USER}/data/mariadb
+      device: /home/jsamardz/data/mariadb
       o: bind
-  #wordpress_volume:
-   # driver: local
-    #driver_opts:
-     # type: none
-      #device: /home/${USER}/data/wordpress
-      # o: bind
+  wordpress_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/jsamardz/data/wordpress
+      o: bind
 
 networks:
   inception_network:
     driver: bridge
+    name: inception_network
 
 secrets:
   db_root_password:
