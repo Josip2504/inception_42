@@ -5,7 +5,7 @@
 
 ## Final Implementation Overview
 
-A fully operational  **LEMP stack**  (Linux-Nginx-MariaDB-PHP) virtualized with Docker, featuring TLS-secured WordPress deployment. Built on  **Debian**  (penultimate stable) with auto-recovery, volumes, and isolated networking.
+A fully operational  **LEMP stack**  (Linux-Nginx-MariaDB-PHP) virtualized with Docker, featuring TLS-secured WordPress deployment. Built on  **Debian**  (penultimate stable) with auto-recovery, volumes, and isolated networking. 
 
 ----------
 
